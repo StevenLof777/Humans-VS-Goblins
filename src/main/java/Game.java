@@ -1,27 +1,35 @@
 public class Game {
     //    Setup
     public Humans human = new Humans();
-    public Goblins golbin1 = new Goblins();
-    public Goblins golbin2 = new Goblins();
-    public Goblins golbin3 = new Goblins();
+    public Goblins goblin = new Goblins();
     public Land land = new Land();
 
+    public Fight fight = new Fight();
+
+    public void generateWorld(){
+        human.setX_axis(4); human.setY_axis(0);
+
+        goblin.setX_axis(4); goblin.setY_axis(1);
+
+//        Player position
+        land.humanPosition(human);
+
+//        Goblin position
+        land.goblinPosition(goblin);
+    }
 
     public void play(){
-//        human.attack(golbin1);
-
-
-//        Player
-        land.humanPosition(0,4, human);
-//        Goblins
-        land.goblinPosition(1,4, golbin1);
-        land.goblinPosition(1,8, golbin2);
-        land.goblinPosition(7,1, golbin3);
+        generateWorld();
         land.print();
         while (human.getHealth()>0){
-            land.move(human);
-        }
+            human.move();
 
+//            Checks to see if the human is in the same spot as a goblin
+            fight.initiate(human, goblin);
+
+            land.humanPosition(human);
+            land.print();
+        }
     }
 
 }

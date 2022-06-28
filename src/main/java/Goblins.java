@@ -1,10 +1,26 @@
 public class Goblins {
     private int strength = 2;
     private int health = 7;
-    private String avatar = ":{";
+    private int y_axis = 0, x_axis = 0;
+
+    public int getX_axis() {
+        return x_axis;
+    }
+
+    public void setX_axis(int x_axis) {
+        this.x_axis = x_axis;
+    }
+
+    public int getY_axis() {
+        return y_axis;
+    }
+
+    public void setY_axis(int y_axis) {
+        this.y_axis = y_axis;
+    }
 
     public String getAvatar() {
-        return avatar;
+        return " :{";
     }
 
     public int getHealth() {
@@ -20,5 +36,7 @@ public class Goblins {
     public void setStrength(int strength) {
         this.strength = strength;
     }
+
+
 
 }
