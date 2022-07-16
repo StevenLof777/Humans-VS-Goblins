@@ -1,3 +1,5 @@
+package main.humans_vs_goblins;
+
 import java.util.Random;
 import java.util.Scanner;
 

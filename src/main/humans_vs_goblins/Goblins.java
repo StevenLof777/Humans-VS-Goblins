@@ -1,3 +1,5 @@
+package main.humans_vs_goblins;
+
 public class Goblins {
     private int strength = 2;
     private int health = 7;

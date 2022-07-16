@@ -1,3 +1,5 @@
+package main.humans_vs_goblins;
+
 public class Game {
     //    Setup
     public Humans human = new Humans();
