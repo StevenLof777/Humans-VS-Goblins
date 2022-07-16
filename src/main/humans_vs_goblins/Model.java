@@ -20,7 +20,7 @@ public class Model extends JPanel implements ActionListener {
     private final int NUMBER_OF_BLOCKS = 15;
     //    Screen size is determined by n blocks times block size
     private final int SCREEN_SIZE = NUMBER_OF_BLOCKS * BLOCK_SIZE;
-    private final int MAX_GOBLINS = 10;
+    private final int MAX_GOBLINS = 12;
     private final int HUMAN_SPEED = 2;
 
     private int NUMBER_OF_GOBLINS = 0;
@@ -85,9 +85,185 @@ public class Model extends JPanel implements ActionListener {
         timer.start();
     }
 
+    private void moveHuman() {
+
+        int pos; //
+        short ch; //Screen data pos
+//        Determine humans position
+        if (human_x % BLOCK_SIZE == 0 && human_y % BLOCK_SIZE == 0) {
+            pos = human_x / BLOCK_SIZE + NUMBER_OF_BLOCKS * (int) (human_y / BLOCK_SIZE);
+            ch = screenData[pos];
+
+            if ((ch & 16) != 0) {
+                screenData[pos] = (short) (ch & 15);
+            }
+//            Checks for collision
+            if (req_dx != 0 || req_dy != 0) {
+                if (!((req_dx == -1 && req_dy == 0 && (ch & 1) != 0)
+                        || (req_dx == 1 && req_dy == 0 && (ch & 4) != 0)
+                        || (req_dx == 0 && req_dy == -1 && (ch & 2) != 0)
+                        || (req_dx == 0 && req_dy == 1 && (ch & 8) != 0))) {
+                    humand_x = req_dx;
+                    humand_y = req_dy;
+                }
+            }
+            // Check for standstill
+            if ((humand_x == -1 && humand_y == 0 && (ch & 1) != 0)
+                    || (humand_x == 1 && humand_y == 0 && (ch & 4) != 0)
+                    || (humand_x == 0 && humand_y == -1 && (ch & 2) != 0)
+                    || (humand_x == 0 && humand_y == 1 && (ch & 8) != 0)) {
+                humand_x = 0;
+                humand_y = 0;
+            }
+        }
+        human_x = human_x + HUMAN_SPEED * humand_x;
+        human_y = human_y + HUMAN_SPEED * humand_y;
+    }
+
+    private void drawHuman(Graphics2D g2d) {
+        if (req_dx == -1) {
+            g2d.drawImage(human, human_x + 1, human_y + 1, this);
+        } else if (req_dx == 1) {
+            g2d.drawImage(human, human_x + 1, human_y + 1, this);
+        } else if (req_dy == -1) {
+            g2d.drawImage(human, human_x + 1, human_y + 1, this);
+        } else {
+            g2d.drawImage(human, human_x + 1, human_y + 1, this);
+        }
+    }
+
+    private void moveGoblins(Graphics2D g2d) {
+
+        int pos;
+        int count;
+
+        for (int i = 0; i < NUMBER_OF_GOBLINS; i++) {
+            if (goblin_x[i] % BLOCK_SIZE == 0 && goblin_y[i] % BLOCK_SIZE == 0) {
+                pos = goblin_x[i] / BLOCK_SIZE + NUMBER_OF_BLOCKS * (int) (goblin_y[i] / BLOCK_SIZE);
+
+                count = 0;
+
+//                If a goblin encounters a border then change directions.
+//                Borders are 16 + 2 or 4 or 6 or 8
+                if ((screenData[pos] & 1) == 0 && goblin_dx[i] != 1) {
+                    dx[count] = -1;
+                    dy[count] = 0;
+                    count++;
+                }
+
+                if ((screenData[pos] & 2) == 0 && goblin_dy[i] != 1) {
+                    dx[count] = 0;
+                    dy[count] = -1;
+                    count++;
+                }
+
+                if ((screenData[pos] & 4) == 0 && goblin_dx[i] != -1) {
+                    dx[count] = 1;
+                    dy[count] = 0;
+                    count++;
+                }
+
+                if ((screenData[pos] & 8) == 0 && goblin_dy[i] != -1) {
+                    dx[count] = 0;
+                    dy[count] = 1;
+                    count++;
+                }
+                if (count == 0) {
+
+                    if ((screenData[pos] & 15) == 15) {
+                        goblin_dx[i] = 0;
+                        goblin_dy[i] = 0;
+                    } else {
+//                        Determines where goblins are
+                        goblin_dx[i] = -goblin_dx[i];
+                        goblin_dy[i] = -goblin_dy[i];
+                    }
+
+                } else {
+                    count = (int) (Math.random() * count);
+
+                    if (count > 3) {
+                        count = 3;
+                    }
+
+                    goblin_dx[i] = dx[count];
+                    goblin_dy[i] = dy[count];
+                }
+
+            }
+
+            goblin_x[i] = goblin_x[i] + (goblin_dx[i] * goblinSpeed[i]);
+            goblin_y[i] = goblin_y[i] + (goblin_dy[i] * goblinSpeed[i]);
+            drawGoblin(g2d, goblin_x[i] + 1, goblin_y[i] + 1);
+
+            if (
+                    human_x > (goblin_x[i] - 12) && human_x < (goblin_x[i] + 12)
+                    && human_y > (goblin_y[i] - 12) && human_y < (goblin_y[i] + 12)
+                    && inGame
+            ) {
+
+                dying = true;
+            }
+        }
+    }
+
+    public void drawGoblin(Graphics2D g2d, int x, int y){
+        g2d.drawImage(goblin, x,y, this);
+    }
+
+    private void checkMaze() {
+        int i = 0;
+        boolean finished = true;
+
+//        Implement treasure chest later
+        while (i < NUMBER_OF_BLOCKS * NUMBER_OF_BLOCKS && finished) {
+
+            if ((screenData[i]) != 0) {
+                finished = false;
+            }
+
+            i++;
+        }
+        if (finished) {
+            initLevel();
+        }
+    }
+
+    private void showIntroScreen(Graphics2D g2d) {
+        String start = "Press SPACE to start";
+        g2d.setColor(Color.red);
+        g2d.drawString(start, (SCREEN_SIZE)/4, 150);
+    }
+
+    private void drawStats(Graphics2D g) {
+        g.setFont(smallFont);
+        g.setColor(Color.yellow);
+        String s = "Gold: " + gold;
+        g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 16);
+
+//        implement hp later
+    }
 
     private void playGame(Graphics2D g2d) {
+        if (dying) {
+            death();
+        } else {
+            moveHuman();
+            drawHuman(g2d);
+            moveGoblins(g2d);
+            checkMaze();
+        }
+    }
 
+    private void death() {
+
+        hp--;
+
+        if (hp == 0) {
+            inGame = false;
+        }
+
+        continueLevel();
     }
 
     private void drawMaze(Graphics2D g2d) {
@@ -123,7 +299,6 @@ public class Model extends JPanel implements ActionListener {
 
                 if ((screenData[i] & 16) != 0) {
                     g2d.setColor(Color.gray);
-                    g2d.fillOval(x + 10, y + 10, 6, 6);
                 }
 
                 i++;
@@ -133,6 +308,7 @@ public class Model extends JPanel implements ActionListener {
 
     private void initGame() {
         gold=0;
+        hp=3;
         NUMBER_OF_GOBLINS=2;
         initLevel();
     }
@@ -143,6 +319,8 @@ public class Model extends JPanel implements ActionListener {
         for (i = 0; i < NUMBER_OF_BLOCKS * NUMBER_OF_BLOCKS; i++) {
             screenData[i] = levelData[i];
         }
+
+        continueLevel();
     }
 
     private void continueLevel() {
@@ -173,8 +351,6 @@ public class Model extends JPanel implements ActionListener {
         dying = false;
     }
 
-
-
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
@@ -184,6 +360,13 @@ public class Model extends JPanel implements ActionListener {
         g2d.fillRect(0, 0, dimension.width, dimension.height);
 
         drawMaze(g2d);
+        drawStats(g2d);
+
+        if (inGame) {
+            playGame(g2d);
+        } else {
+            showIntroScreen(g2d);
+        }
 
         Toolkit.getDefaultToolkit().sync();
         g2d.dispose();
