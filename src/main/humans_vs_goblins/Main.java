@@ -3,9 +3,9 @@ package main.humans_vs_goblins;
 import javax.swing.*;
 public class Main extends JFrame {
 
-//    public Main(){
-//        add(new Model());
-//    }
+    public Main(){
+        add(new Model());
+    }
 
     public static void main(String[] args){
         Main pac = new Main();
