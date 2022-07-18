@@ -8,7 +8,7 @@ by the human.
 
 ## Demo
 
-![Dragon Cave demo](goblins_vs_humans.gif)
+![Dragon Cave demo](images/goblins-vs-humans.PNG)
 
 ## Authors
 
