@@ -1,3 +1,5 @@
+package main.humans_vs_goblins;
+
 public class Game {
     //    Setup
     public Humans human = new Humans();
@@ -35,7 +37,7 @@ public class Game {
         System.out.println("------------------------------");
 
         while (human.getHealth()>0){
-            human.move();
+//            human.move();
 
 //            Checks to see if the human is in the same spot as a goblin
             fight.initiate(human, goblinOne);
